@@ -23,18 +23,13 @@ contract GolosTest is Test {
     // --- Helpers ---
 
     /// @dev Sign a comment message with the given private key
-    function _sign(
-        uint256 privateKey,
-        address _author,
-        bytes32 _postId,
-        string memory _content
-    ) internal pure returns (bytes memory) {
-        bytes32 messageHash = keccak256(
-            abi.encodePacked(_author, _postId, _content)
-        );
-        bytes32 ethSignedHash = keccak256(
-            abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash)
-        );
+    function _sign(uint256 privateKey, address _author, bytes32 _postId, string memory _content)
+        internal
+        pure
+        returns (bytes memory)
+    {
+        bytes32 messageHash = keccak256(abi.encodePacked(_author, _postId, _content));
+        bytes32 ethSignedHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash));
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(privateKey, ethSignedHash);
         return abi.encodePacked(r, s, v);
     }
