@@ -1,9 +1,27 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
+import comment from "./routes/comment.js";
 
-const app = new Hono<{ Bindings: CloudflareBindings }>();
+export type Env = {
+  RELAYER_PRIVATE_KEY: string;
+  CONTRACT_ADDRESS: string;
+  RPC_URL: string;
+  ALLOWED_ORIGIN: string;
+  RATE_LIMIT: KVNamespace;
+};
 
-app.get("/message", (c) => {
-  return c.text("Hello Hono!");
-});
+const app = new Hono<{ Bindings: Env }>();
+
+app.use(
+  "*",
+  cors({
+    origin: (origin, c) => {
+      const allowed = c.env.ALLOWED_ORIGIN;
+      return origin === allowed ? origin : "";
+    },
+  }),
+);
+
+app.route("/", comment);
 
 export default app;

@@ -23,12 +23,14 @@ contract GolosTest is Test {
     // --- Helpers ---
 
     /// @dev Sign a comment message with the given private key
-    function _sign(uint256 privateKey, address _author, bytes32 _postId, string memory _content)
-        internal
-        pure
-        returns (bytes memory)
-    {
-        bytes32 messageHash = keccak256(abi.encodePacked(_author, _postId, _content));
+    function _sign(
+        uint256 privateKey,
+        address _author,
+        bytes32 _postId,
+        string memory _username,
+        string memory _content
+    ) internal pure returns (bytes memory) {
+        bytes32 messageHash = keccak256(abi.encodePacked(_author, _postId, _username, _content));
         bytes32 ethSignedHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash));
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(privateKey, ethSignedHash);
         return abi.encodePacked(r, s, v);
@@ -52,88 +54,88 @@ contract GolosTest is Test {
 
     /// @dev Owner can post a comment directly
     function test_comment() public {
-        golos.comment(postId, "hello");
+        golos.comment(postId, "owner", "hello");
     }
 
     /// @dev Non-owner is rejected
     function test_comment_revert_notOwner() public {
         vm.prank(author);
         vm.expectRevert("Not owner");
-        golos.comment(postId, "hello");
+        golos.comment(postId, "bob", "hello");
     }
 
     /// @dev Comment exceeding 5KB is rejected
     function test_comment_revert_tooLong() public {
         bytes memory longContent = new bytes(5121);
         vm.expectRevert("Comment too long");
-        golos.comment(postId, string(longContent));
+        golos.comment(postId, "owner", string(longContent));
     }
 
     // --- commentFor() ---
 
     /// @dev Relayer can post on behalf of a user with valid signature
     function test_commentFor() public {
-        bytes memory sig = _sign(authorKey, author, postId, "great post");
+        bytes memory sig = _sign(authorKey, author, postId, "bob", "great post");
 
         vm.prank(relayer);
-        golos.commentFor(author, postId, "great post", sig);
+        golos.commentFor(author, postId, "bob", "great post", sig);
     }
 
     /// @dev Non-relayer is rejected
     function test_commentFor_revert_notRelayer() public {
-        bytes memory sig = _sign(authorKey, author, postId, "hello");
+        bytes memory sig = _sign(authorKey, author, postId, "bob", "hello");
 
         vm.prank(author);
         vm.expectRevert("Not relayer");
-        golos.commentFor(author, postId, "hello", sig);
+        golos.commentFor(author, postId, "bob", "hello", sig);
     }
 
     /// @dev Comment exceeding 5KB is rejected
     function test_commentFor_revert_tooLong() public {
         bytes memory longContent = new bytes(5121);
         string memory content = string(longContent);
-        bytes memory sig = _sign(authorKey, author, postId, content);
+        bytes memory sig = _sign(authorKey, author, postId, "bob", content);
 
         vm.prank(relayer);
         vm.expectRevert("Comment too long");
-        golos.commentFor(author, postId, content, sig);
+        golos.commentFor(author, postId, "bob", content, sig);
     }
 
     /// @dev Signature from a different key is rejected
     function test_commentFor_revert_invalidSignature() public {
         // Sign with relayer key instead of author key
-        bytes memory sig = _sign(relayerKey, author, postId, "hello");
+        bytes memory sig = _sign(relayerKey, author, postId, "bob", "hello");
 
         vm.prank(relayer);
         vm.expectRevert("Invalid signature");
-        golos.commentFor(author, postId, "hello", sig);
+        golos.commentFor(author, postId, "bob", "hello", sig);
     }
 
     // --- Cooldown ---
 
     /// @dev Second comment within cooldown period is rejected
     function test_commentFor_revert_cooldown() public {
-        bytes memory sig1 = _sign(authorKey, author, postId, "first");
+        bytes memory sig1 = _sign(authorKey, author, postId, "bob", "first");
         vm.prank(relayer);
-        golos.commentFor(author, postId, "first", sig1);
+        golos.commentFor(author, postId, "bob", "first", sig1);
 
-        bytes memory sig2 = _sign(authorKey, author, postId, "second");
+        bytes memory sig2 = _sign(authorKey, author, postId, "bob", "second");
         vm.prank(relayer);
         vm.expectRevert("Too soon");
-        golos.commentFor(author, postId, "second", sig2);
+        golos.commentFor(author, postId, "bob", "second", sig2);
     }
 
     /// @dev Comment after cooldown period passes
     function test_commentFor_afterCooldown() public {
-        bytes memory sig1 = _sign(authorKey, author, postId, "first");
+        bytes memory sig1 = _sign(authorKey, author, postId, "bob", "first");
         vm.prank(relayer);
-        golos.commentFor(author, postId, "first", sig1);
+        golos.commentFor(author, postId, "bob", "first", sig1);
 
         vm.warp(block.timestamp + 61);
 
-        bytes memory sig2 = _sign(authorKey, author, postId, "second");
+        bytes memory sig2 = _sign(authorKey, author, postId, "bob", "second");
         vm.prank(relayer);
-        golos.commentFor(author, postId, "second", sig2);
+        golos.commentFor(author, postId, "bob", "second", sig2);
     }
 
     // --- setRelayer() ---
