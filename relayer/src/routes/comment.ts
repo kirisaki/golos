@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import type { Hex } from "viem";
-import { submitComment } from "../lib/contract.js";
+import { resolveEnsName, submitComment } from "../lib/contract.js";
 import { checkRateLimit } from "../lib/ratelimit.js";
 import { validateCommentRequest } from "../lib/validation.js";
 import type { Env } from "../index.js";
@@ -24,16 +24,22 @@ comment.post("/comment", async (c) => {
 
   const { author, postSlug, username, content, signature } = result.data;
 
+  // Resolve ENS name via Ethereum mainnet (best-effort)
+  const ensName = c.env.ENS_RPC_URL
+    ? await resolveEnsName(c.env.ENS_RPC_URL, author as Hex)
+    : "";
+
   try {
     const txHash = await submitComment(
       c.env,
       author as Hex,
       postSlug,
       username,
+      ensName,
       content,
       signature as Hex,
     );
-    return c.json({ txHash });
+    return c.json({ txHash, ensName: ensName || undefined });
   } catch (e) {
     if (e instanceof BaseError) {
       const revertError = e.walk(

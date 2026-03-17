@@ -7,6 +7,7 @@ export type Env = {
   CONTRACT_ADDRESS: string;
   RPC_URL: string;
   ALLOWED_ORIGIN: string;
+  ENS_RPC_URL?: string;
   RATE_LIMIT: KVNamespace;
 };
 

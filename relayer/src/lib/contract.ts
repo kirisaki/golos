@@ -7,7 +7,7 @@ import {
   type Hex,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { baseSepolia } from "viem/chains";
+import { baseSepolia, mainnet } from "viem/chains";
 
 export const golosAbi = [
   {
@@ -17,6 +17,7 @@ export const golosAbi = [
       { name: "author", type: "address" },
       { name: "postId", type: "bytes32" },
       { name: "username", type: "string" },
+      { name: "ensName", type: "string" },
       { name: "content", type: "string" },
       { name: "signature", type: "bytes" },
     ],
@@ -29,11 +30,29 @@ export function slugToPostId(postSlug: string): Hex {
   return keccak256(toHex(postSlug));
 }
 
+export async function resolveEnsName(
+  ensRpcUrl: string,
+  address: Hex,
+): Promise<string> {
+  const client = createPublicClient({
+    chain: mainnet,
+    transport: http(ensRpcUrl),
+  });
+
+  try {
+    const name = await client.getEnsName({ address });
+    return name ?? "";
+  } catch {
+    return "";
+  }
+}
+
 export async function submitComment(
   env: { RELAYER_PRIVATE_KEY: string; CONTRACT_ADDRESS: string; RPC_URL: string },
   author: Hex,
   postSlug: string,
   username: string,
+  ensName: string,
   content: string,
   signature: Hex,
 ): Promise<Hex> {
@@ -57,7 +76,7 @@ export async function submitComment(
     address: env.CONTRACT_ADDRESS as Hex,
     abi: golosAbi,
     functionName: "commentFor",
-    args: [author, postId, username, content, signature],
+    args: [author, postId, username, ensName, content, signature],
   });
 
   return client.writeContract(request);

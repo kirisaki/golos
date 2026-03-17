@@ -11,7 +11,12 @@ contract Golos {
     uint256 public constant COOLDOWN = 60;
 
     event CommentPosted(
-        bytes32 indexed postId, address indexed author, string username, string content, uint256 timestamp
+        bytes32 indexed postId,
+        address indexed author,
+        string username,
+        string ensName,
+        string content,
+        uint256 timestamp
     );
 
     function setOwner(address _owner) external onlyOwner {
@@ -33,15 +38,19 @@ contract Golos {
         relayer = _relayer;
     }
 
-    function comment(bytes32 postId, string calldata username, string calldata content) external onlyOwner {
+    function comment(bytes32 postId, string calldata username, string calldata ensName, string calldata content)
+        external
+        onlyOwner
+    {
         require(bytes(content).length <= 5120, "Comment too long");
-        emit CommentPosted(postId, msg.sender, username, content, block.timestamp);
+        emit CommentPosted(postId, msg.sender, username, ensName, content, block.timestamp);
     }
 
     function commentFor(
         address author,
         bytes32 postId,
         string calldata username,
+        string calldata ensName,
         string calldata content,
         bytes calldata signature
     ) external onlyRelayer {
@@ -54,7 +63,7 @@ contract Golos {
         address recovered = ECDSA.recover(ethSignedHash, signature);
         require(recovered == author, "Invalid signature");
 
-        emit CommentPosted(postId, author, username, content, block.timestamp);
+        emit CommentPosted(postId, author, username, ensName, content, block.timestamp);
     }
 
     function setRelayer(address _relayer) external onlyOwner {

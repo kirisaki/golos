@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 
 vi.mock("../src/lib/contract.js", () => ({
   submitComment: vi.fn(),
+  resolveEnsName: vi.fn(async () => ""),
   slugToPostId: vi.fn(() => "0x" + "ab".repeat(32)),
 }));
 
