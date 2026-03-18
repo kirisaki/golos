@@ -10,8 +10,8 @@
 		"enabled": true
 	},
 	"vars": {
-		"CONTRACT_ADDRESS": "0x694790a0A09b60103C616003B8404b141557F4DA",
-		"RPC_URL": "https://sepolia.base.org",
+		"CONTRACT_ADDRESS": "0xA2e7c4BBD710BEE6B84D2E69e3497a0DAF205a7A",
+		"RPC_URL": "https://mainnet.base.org",
 		"ALLOWED_ORIGINS": "https://pravda.klara.works,http://localhost:4321",
 		"ENS_RPC_URL": "https://ethereum-rpc.publicnode.com",
 		"GOOGLE_CLIENT_ID": "318342039342-r1cnd5bmu67v0tcsifjde16t6gh3k9se.apps.googleusercontent.com",

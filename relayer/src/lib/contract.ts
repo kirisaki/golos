@@ -7,7 +7,7 @@ import {
   type Hex,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { baseSepolia, mainnet } from "viem/chains";
+import { base, mainnet } from "viem/chains";
 
 export const golosAbi = [
   {
@@ -60,12 +60,12 @@ export async function submitComment(
 
   const client = createWalletClient({
     account,
-    chain: baseSepolia,
+    chain: base,
     transport: http(env.RPC_URL),
   });
 
   const publicClient = createPublicClient({
-    chain: baseSepolia,
+    chain: base,
     transport: http(env.RPC_URL),
   });
 
