@@ -104,7 +104,7 @@ auth.get("/auth/google/callback", async (c) => {
     userInfo.displayName,
   );
 
-  const redirectUrl = new URL("/auth/callback", c.env.ALLOWED_ORIGIN);
+  const redirectUrl = new URL("/ja/auth/callback", c.env.ALLOWED_ORIGIN);
   redirectUrl.searchParams.set("token", token);
   return c.redirect(redirectUrl.toString());
 });

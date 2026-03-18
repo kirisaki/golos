@@ -28,7 +28,7 @@ commentSocial.post("/comment/social", authMiddleware, async (c) => {
     return c.json({ error: "Invalid request body" }, 400);
   }
 
-  const { postSlug, content } = body as Record<string, unknown>;
+  const { postSlug, content, username: bodyUsername } = body as Record<string, unknown>;
 
   if (typeof postSlug !== "string" || postSlug.length === 0) {
     return c.json({ error: "postSlug is required" }, 400);
@@ -62,7 +62,9 @@ commentSocial.post("/comment/social", authMiddleware, async (c) => {
   }
 
   const postId = slugToPostId(postSlug);
-  const username = displayName;
+  const username = typeof bodyUsername === "string" && bodyUsername.trim()
+    ? bodyUsername.trim()
+    : displayName;
 
   // Sign the comment with the custodial wallet
   const signature = await signComment(

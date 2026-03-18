@@ -56,7 +56,12 @@ export class GoogleOAuthProvider implements OAuthProvider {
     if (!tokenData.id_token) throw new Error("No id_token in Google response");
 
     // Decode JWT payload (no verification needed, we just got it from Google over HTTPS)
-    const payload = JSON.parse(atob(tokenData.id_token.split(".")[1]));
+    // Google uses base64url encoding; atob doesn't handle multibyte UTF-8
+    const base64url = tokenData.id_token.split(".")[1];
+    const base64 = base64url.replace(/-/g, "+").replace(/_/g, "/");
+    const binary = atob(base64);
+    const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+    const payload = JSON.parse(new TextDecoder().decode(bytes));
 
     return {
       providerAccountId: payload.sub,
