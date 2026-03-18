@@ -12,3 +12,16 @@ export async function checkRateLimit(
   await kv.put(key, "1", { expirationTtl: COOLDOWN_SECONDS });
   return true;
 }
+
+export async function checkUserRateLimit(
+  kv: KVNamespace,
+  userId: string,
+): Promise<boolean> {
+  const key = `ratelimit:user:${userId}`;
+  const existing = await kv.get(key);
+  if (existing !== null) {
+    return false;
+  }
+  await kv.put(key, "1", { expirationTtl: COOLDOWN_SECONDS });
+  return true;
+}

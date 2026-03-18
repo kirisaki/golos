@@ -13,12 +13,21 @@
 		"CONTRACT_ADDRESS": "0x694790a0A09b60103C616003B8404b141557F4DA",
 		"RPC_URL": "https://sepolia.base.org",
 		"ALLOWED_ORIGIN": "http://localhost:4321",
-		"ENS_RPC_URL": "https://ethereum-rpc.publicnode.com"
+		"ENS_RPC_URL": "https://ethereum-rpc.publicnode.com",
+		"GOOGLE_CLIENT_ID": "318342039342-r1cnd5bmu67v0tcsifjde16t6gh3k9se.apps.googleusercontent.com",
+		"GOOGLE_REDIRECT_URI": "https://relayer.kristina3731.workers.dev/auth/google/callback"
 	},
 	"kv_namespaces": [
 		{
 			"binding": "RATE_LIMIT",
 			"id": "220069a009d346eebcc0f824a7f14bbd"
+		}
+	],
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "golos-users",
+			"database_id": "6e6b7db1-b90a-4a5c-9cd4-2c5e40fe0f0b"
 		}
 	]
 }
