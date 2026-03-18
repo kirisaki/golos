@@ -9,8 +9,11 @@ contract Golos {
     address public relayer;
     mapping(address => uint256) public lastCommentTime;
     uint256 public constant COOLDOWN = 60;
+    uint256 public commentCount;
+    mapping(uint256 => bool) public isSpam;
 
     event CommentPosted(
+        uint256 indexed commentId,
         bytes32 indexed postId,
         address indexed author,
         string username,
@@ -43,7 +46,8 @@ contract Golos {
         onlyOwner
     {
         require(bytes(content).length <= 5120, "Comment too long");
-        emit CommentPosted(postId, msg.sender, username, ensName, content, block.timestamp);
+        uint256 id = commentCount++;
+        emit CommentPosted(id, postId, msg.sender, username, ensName, content, block.timestamp);
     }
 
     function commentFor(
@@ -63,7 +67,12 @@ contract Golos {
         address recovered = ECDSA.recover(ethSignedHash, signature);
         require(recovered == author, "Invalid signature");
 
-        emit CommentPosted(postId, author, username, ensName, content, block.timestamp);
+        uint256 id = commentCount++;
+        emit CommentPosted(id, postId, author, username, ensName, content, block.timestamp);
+    }
+
+    function setSpam(uint256 commentId, bool _isSpam) external onlyOwner {
+        isSpam[commentId] = _isSpam;
     }
 
     function setRelayer(address _relayer) external onlyOwner {

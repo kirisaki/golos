@@ -10,7 +10,7 @@
 		"enabled": true
 	},
 	"vars": {
-		"CONTRACT_ADDRESS": "0xA2e7c4BBD710BEE6B84D2E69e3497a0DAF205a7A",
+		"CONTRACT_ADDRESS": "0x4Dbfdd81D982c2F7b1fD844D49b93483b5c0900D",
 		"RPC_URL": "https://mainnet.base.org",
 		"ALLOWED_ORIGINS": "https://pravda.klara.works,http://localhost:4321",
 		"ENS_RPC_URL": "https://ethereum-rpc.publicnode.com",

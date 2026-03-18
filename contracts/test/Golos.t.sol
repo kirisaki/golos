@@ -138,6 +138,39 @@ contract GolosTest is Test {
         golos.commentFor(author, postId, "bob", "", "second", sig2);
     }
 
+    // --- setSpam() ---
+
+    /// @dev Owner can mark a comment as spam
+    function test_setSpam() public {
+        golos.comment(postId, "owner", "", "hello");
+        assertEq(golos.isSpam(0), false);
+        golos.setSpam(0, true);
+        assertEq(golos.isSpam(0), true);
+    }
+
+    /// @dev Owner can unmark spam
+    function test_setSpam_unmark() public {
+        golos.comment(postId, "owner", "", "hello");
+        golos.setSpam(0, true);
+        golos.setSpam(0, false);
+        assertEq(golos.isSpam(0), false);
+    }
+
+    /// @dev Non-owner cannot set spam
+    function test_setSpam_revert_notOwner() public {
+        golos.comment(postId, "owner", "", "hello");
+        vm.prank(author);
+        vm.expectRevert("Not owner");
+        golos.setSpam(0, true);
+    }
+
+    /// @dev Comment IDs increment correctly
+    function test_commentCount() public {
+        golos.comment(postId, "owner", "", "first");
+        golos.comment(postId, "owner", "", "second");
+        assertEq(golos.commentCount(), 2);
+    }
+
     // --- setRelayer() ---
 
     /// @dev Owner can update the relayer address
