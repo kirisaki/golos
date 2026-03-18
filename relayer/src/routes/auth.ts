@@ -8,7 +8,10 @@ const auth = new Hono<{ Bindings: Env }>();
 
 auth.get("/auth/google", async (c) => {
   const state = crypto.randomUUID();
-  await c.env.RATE_LIMIT.put(`oauth_state:${state}`, "1", { expirationTtl: 300 });
+  const origin = c.req.header("Referer")
+    ? new URL(c.req.header("Referer")!).origin
+    : c.env.ALLOWED_ORIGINS.split(",")[0].trim();
+  await c.env.RATE_LIMIT.put(`oauth_state:${state}`, origin, { expirationTtl: 300 });
 
   const provider = new GoogleOAuthProvider(
     c.env.GOOGLE_CLIENT_ID,
@@ -26,9 +29,9 @@ auth.get("/auth/google/callback", async (c) => {
     return c.json({ error: "Missing code or state" }, 400);
   }
 
-  // Validate and consume state
-  const storedState = await c.env.RATE_LIMIT.get(`oauth_state:${state}`);
-  if (!storedState) {
+  // Validate and consume state (value is the origin URL)
+  const frontendOrigin = await c.env.RATE_LIMIT.get(`oauth_state:${state}`);
+  if (!frontendOrigin) {
     return c.json({ error: "Invalid or expired state" }, 400);
   }
   await c.env.RATE_LIMIT.delete(`oauth_state:${state}`);
@@ -104,7 +107,7 @@ auth.get("/auth/google/callback", async (c) => {
     userInfo.displayName,
   );
 
-  const redirectUrl = new URL("/ja/auth/callback", c.env.ALLOWED_ORIGIN);
+  const redirectUrl = new URL("/ja/auth/callback", frontendOrigin);
   redirectUrl.searchParams.set("token", token);
   return c.redirect(redirectUrl.toString());
 });

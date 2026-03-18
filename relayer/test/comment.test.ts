@@ -18,7 +18,7 @@ const mockEnv = {
   RELAYER_PRIVATE_KEY: "0x" + "ab".repeat(32),
   CONTRACT_ADDRESS: "0x" + "00".repeat(20),
   RPC_URL: "https://rpc.example.com",
-  ALLOWED_ORIGIN: "http://localhost:4321",
+  ALLOWED_ORIGINS: "http://localhost:4321",
   RATE_LIMIT: {} as KVNamespace,
 };
 

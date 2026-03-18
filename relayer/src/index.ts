@@ -8,7 +8,7 @@ export type Env = {
   RELAYER_PRIVATE_KEY: string;
   CONTRACT_ADDRESS: string;
   RPC_URL: string;
-  ALLOWED_ORIGIN: string;
+  ALLOWED_ORIGINS: string;
   ENS_RPC_URL?: string;
   RATE_LIMIT: KVNamespace;
   DB: D1Database;
@@ -25,8 +25,8 @@ app.use(
   "*",
   cors({
     origin: (origin, c) => {
-      const allowed = c.env.ALLOWED_ORIGIN;
-      return origin === allowed ? origin : "";
+      const allowed = c.env.ALLOWED_ORIGINS.split(",").map((s: string) => s.trim());
+      return allowed.includes(origin) ? origin : "";
     },
   }),
 );
