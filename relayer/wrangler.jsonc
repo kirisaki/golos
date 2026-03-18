@@ -11,9 +11,9 @@
 	},
 	"vars": {
 		"CONTRACT_ADDRESS": "0x4Dbfdd81D982c2F7b1fD844D49b93483b5c0900D",
-		"RPC_URL": "https://mainnet.base.org",
+		"RPC_URL": "https://base-mainnet.g.alchemy.com/v2/1hfCF9ujrITFEuiu7gNaa",
 		"ALLOWED_ORIGINS": "https://pravda.klara.works,http://localhost:4321",
-		"ENS_RPC_URL": "https://ethereum-rpc.publicnode.com",
+		"ENS_RPC_URL": "https://eth-mainnet.g.alchemy.com/v2/1hfCF9ujrITFEuiu7gNaa",
 		"GOOGLE_CLIENT_ID": "318342039342-r1cnd5bmu67v0tcsifjde16t6gh3k9se.apps.googleusercontent.com",
 		"GOOGLE_REDIRECT_URI": "https://relayer.kristina3731.workers.dev/auth/google/callback"
 	},
